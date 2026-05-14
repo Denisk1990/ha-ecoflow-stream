@@ -1,0 +1,5 @@
+DOMAIN = "ecoflow_stream"
+
+DEFAULT_NAME = "EcoFlow STREAM"
+
+UPDATE_INTERVAL = 10
