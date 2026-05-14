@@ -6,7 +6,6 @@ import hashlib
 import hmac
 import logging
 import time
-from urllib.parse import urlencode
 
 import aiohttp
 
@@ -38,7 +37,12 @@ class EcoFlowStreamApi:
         if params:
             sign_params.update(params)
 
-        sign_str = urlencode(sorted(sign_params.items()))
+        sign_str = "&".join(
+            f"{k}={sign_params[k]}"
+            for k in sorted(sign_params)
+        )
+
+        _LOGGER.debug("EcoFlow sign string: %s", sign_str)
 
         sign = hmac.new(
             self.secret_key.encode("utf-8"),
@@ -51,9 +55,15 @@ class EcoFlowStreamApi:
             "nonce": nonce,
             "timestamp": timestamp,
             "sign": sign,
+            "Content-Type": "application/json",
         }
 
-    async def _get(self, session: aiohttp.ClientSession, path: str, params: dict) -> dict:
+    async def _get(
+        self,
+        session: aiohttp.ClientSession,
+        path: str,
+        params: dict,
+    ) -> dict:
         """Send signed GET request."""
         url = f"{BASE_URL}{path}"
 
